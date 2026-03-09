@@ -1,8 +1,9 @@
-import math
+"""handles bank balances and transactions"""
 from moneypoly.config import BANK_STARTING_FUNDS
 
 
 class Bank:
+    """holds bank state and provides transaction and query functions"""
     def __init__(self):
         self._funds = BANK_STARTING_FUNDS
         self._loans_issued = []
@@ -17,6 +18,7 @@ class Bank:
         Receive funds into the bank (taxes, fines, auction proceeds, etc.).
         Negative amounts are silently ignored.
         """
+        # TODO: not following docstring (negative amounts not ignored)
         self._funds += amount
         self._total_collected += amount
 
@@ -40,6 +42,7 @@ class Bank:
         Issue an emergency loan to `player`, crediting their balance with `amount`.
         The bank's own funds are reduced accordingly.
         """
+        # TODO: bank's funds aren't reduced
         if amount <= 0:
             return
         player.add_money(amount)
