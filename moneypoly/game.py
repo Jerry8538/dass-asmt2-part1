@@ -1,7 +1,8 @@
-import os
+"""implements main game logic"""
+
+import dataclasses
 
 from moneypoly.config import (
-    GO_TO_JAIL_POSITION,
     JAIL_FINE,
     AUCTION_MIN_INCREMENT,
     INCOME_TAX_AMOUNT,
@@ -17,6 +18,13 @@ from moneypoly.cards import CardDeck, CHANCE_CARDS, COMMUNITY_CHEST_CARDS
 from moneypoly import ui
 
 
+@dataclasses.dataclass
+class _Game:
+    """subclass to store some instance attributes"""
+    current_index: int
+    turn_number: int
+    running: bool
+
 class Game:
     """Manages the full state and flow of a MoneyPoly game session."""
 
@@ -25,26 +33,26 @@ class Game:
         self.bank = Bank()
         self.dice = Dice()
         self.players = [Player(name) for name in player_names]
-        self.current_index = 0
-        self.turn_number = 0
-        self.running = True
+
+        self.state = _Game(0, 0, True)
+
         self.chance_deck = CardDeck(CHANCE_CARDS)
         self.community_deck = CardDeck(COMMUNITY_CHEST_CARDS)
 
     def current_player(self):
         """Return the Player whose turn it currently is."""
-        return self.players[self.current_index]
+        return self.players[self.state.current_index]
 
     def advance_turn(self):
         """Move to the next player in the rotation."""
-        self.current_index = (self.current_index + 1) % len(self.players)
-        self.turn_number += 1
+        self.state.current_index = (self.state.current_index + 1) % len(self.players)
+        self.state.turn_number += 1
 
     def play_turn(self):
         """Execute one complete turn for the current player."""
         player = self.current_player()
         ui.print_banner(
-            f"Turn {self.turn_number + 1}  |  {player.name}  |  ${player.balance}"
+            f"Turn {self.state.turn_number + 1}  |  {player.name}  |  ${player.balance}"
         )
 
         if player.in_jail:
@@ -79,6 +87,7 @@ class Game:
         print(f"  {player.name} moved to position {position}  [{tile}]")
 
         if tile == "go_to_jail":
+            # TODO: should we use GO_TO_JAIL_POSITION ??
             player.go_to_jail()
             print(f"  {player.name} has been sent to Jail!")
 
@@ -292,6 +301,19 @@ class Game:
             print(f"  {player.name} rolled: {self.dice.describe()}")
             self._move_and_resolve(player, roll)
 
+    def _handle_move_card(self, player, value):
+        """deals with a move_to card drawn by player"""
+        old_pos = player.position
+        player.position = value
+        if value < old_pos:
+            player.add_money(GO_SALARY)
+            print(f"  {player.name} passed Go and collected ${GO_SALARY}.")
+        tile = self.board.get_tile_type(value)
+        if tile == "property":
+            prop = self.board.get_property_at(value)
+            if prop:
+                self._handle_property_tile(player, prop)
+
     def _apply_card(self, player, card):
         """Apply the effect of a drawn Chance or Community Chest card."""
         if card is None:
@@ -317,16 +339,7 @@ class Game:
             print(f"  {player.name} now holds a Get Out of Jail Free card.")
 
         elif action == "move_to":
-            old_pos = player.position
-            player.position = value
-            if value < old_pos:
-                player.add_money(GO_SALARY)
-                print(f"  {player.name} passed Go and collected ${GO_SALARY}.")
-            tile = self.board.get_tile_type(value)
-            if tile == "property":
-                prop = self.board.get_property_at(value)
-                if prop:
-                    self._handle_property_tile(player, prop)
+            self._handle_move_card(player, value)
 
         elif action == "birthday":
             for other in self.players:
@@ -353,8 +366,8 @@ class Game:
             player.properties.clear()
             if player in self.players:
                 self.players.remove(player)
-            if self.current_index >= len(self.players):
-                self.current_index = 0
+            if self.state.current_index >= len(self.players):
+                self.state.current_index = 0
 
     def find_winner(self):
         """Return the player with the highest net worth."""
@@ -369,7 +382,7 @@ class Game:
         for p in self.players:
             print(f"  {p.name} starts with ${p.balance}.")
 
-        while self.running and self.turn_number < MAX_TURNS:
+        while self.state.running and self.state.turn_number < MAX_TURNS:
             if len(self.players) <= 1:
                 break
             self.play_turn()
@@ -378,7 +391,7 @@ class Game:
 
         winner = self.find_winner()
         if winner:
-            ui.print_banner(f"GAME OVER")
+            ui.print_banner("GAME OVER")
             print(f"\n  {winner.name} wins with a net worth of ${winner.net_worth()}!\n")
         else:
             print("\n  The game ended with no players remaining.")
@@ -401,7 +414,7 @@ class Game:
 
             if choice == 0:
                 break
-            elif choice == 1:
+            if choice == 1:
                 ui.print_standings(self.players)
             elif choice == 2:
                 ui.print_board_ownership(self.board)
@@ -450,7 +463,7 @@ class Game:
         for i, p in enumerate(others):
             print(f"  {i + 1}. {p.name}  (${p.balance})")
         idx = ui.safe_int_input("  Trade with: ", default=0) - 1
-        if not (0 <= idx < len(others)):
+        if not 0 <= idx < len(others):
             return
         partner = others[idx]
         if not player.properties:
@@ -459,7 +472,7 @@ class Game:
         for i, prop in enumerate(player.properties):
             print(f"  {i + 1}. {prop.name}")
         pidx = ui.safe_int_input("  Property to offer: ", default=0) - 1
-        if not (0 <= pidx < len(player.properties)):
+        if not 0 <= pidx < len(player.properties):
             return
         chosen_prop = player.properties[pidx]
         cash = ui.safe_int_input(
