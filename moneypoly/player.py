@@ -1,6 +1,13 @@
-import sys
+"""deals with players"""
+import dataclasses
 from moneypoly.config import STARTING_BALANCE, BOARD_SIZE, GO_SALARY, JAIL_POSITION
 
+@dataclasses.dataclass
+class JailState:
+    """holds state variables for player related to jail"""
+    in_jail: bool
+    jail_turns: int
+    get_out_of_jail_cards: int
 
 class Player:
     """Represents a single player in a MoneyPoly game."""
@@ -10,9 +17,7 @@ class Player:
         self.balance = balance
         self.position = 0
         self.properties = []
-        self.in_jail = False
-        self.jail_turns = 0
-        self.get_out_of_jail_cards = 0
+        self.jail_state = JailState(False, 0, 0)
         self.is_eliminated = False
 
 
@@ -45,6 +50,8 @@ class Player:
         old_position = self.position
         self.position = (self.position + steps) % BOARD_SIZE
 
+        # TODO: handle passing GO as well as landing on GO
+        #       compare with old_position
         if self.position == 0:
             self.add_money(GO_SALARY)
             print(f"  {self.name} landed on Go and collected ${GO_SALARY}.")
@@ -54,8 +61,8 @@ class Player:
     def go_to_jail(self):
         """Send this player directly to the Jail square."""
         self.position = JAIL_POSITION
-        self.in_jail = True
-        self.jail_turns = 0
+        self.jail_state.in_jail = True
+        self.jail_state.jail_turns = 0
 
 
     def add_property(self, prop):
@@ -75,7 +82,7 @@ class Player:
 
     def status_line(self):
         """Return a concise one-line status string for this player."""
-        jail_tag = " [JAILED]" if self.in_jail else ""
+        jail_tag = " [JAILED]" if self.jail_state.in_jail else ""
         return (
             f"{self.name}: ${self.balance}  "
             f"pos={self.position}  "
