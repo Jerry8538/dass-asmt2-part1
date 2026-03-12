@@ -1,4 +1,4 @@
-from moneypoly.property import Property, PropertyGroup
+from moneypoly.property import Property, PropertyGroup, PropertyNumbers
 from moneypoly.config import (
     JAIL_POSITION,
     GO_TO_JAIL_POSITION,
@@ -53,34 +53,34 @@ class Board:
         """Instantiate every purchasable property and return as a list."""
         g = self.groups
         return [
-            Property("Mediterranean Avenue",   1,  60,  2,  g["brown"]),
-            Property("Baltic Avenue",          3,  60,  4,  g["brown"]),
-            Property("Oriental Avenue",        6,  100, 6,  g["light_blue"]),
-            Property("Vermont Avenue",         8,  100, 6,  g["light_blue"]),
-            Property("Connecticut Avenue",     9,  120, 8,  g["light_blue"]),
-            Property("St. Charles Place",      11, 140, 10, g["pink"]),
-            Property("States Avenue",          13, 140, 10, g["pink"]),
-            Property("Virginia Avenue",        14, 160, 12, g["pink"]),
-            Property("St. James Place",        16, 180, 14, g["orange"]),
-            Property("Tennessee Avenue",       18, 180, 14, g["orange"]),
-            Property("New York Avenue",        19, 200, 16, g["orange"]),
-            Property("Kentucky Avenue",        21, 220, 18, g["red"]),
-            Property("Indiana Avenue",         23, 220, 18, g["red"]),
-            Property("Illinois Avenue",        24, 240, 20, g["red"]),
-            Property("Atlantic Avenue",        26, 260, 22, g["yellow"]),
-            Property("Ventnor Avenue",         27, 260, 22, g["yellow"]),
-            Property("Marvin Gardens",         29, 280, 24, g["yellow"]),
-            Property("Pacific Avenue",         31, 300, 26, g["green"]),
-            Property("North Carolina Avenue",  32, 300, 26, g["green"]),
-            Property("Pennsylvania Avenue",    34, 320, 28, g["green"]),
-            Property("Park Place",             37, 350, 35, g["dark_blue"]),
-            Property("Boardwalk",              39, 400, 50, g["dark_blue"]),
+            Property("Mediterranean Avenue",   PropertyNumbers(1,  60,  2),  g["brown"]),
+            Property("Baltic Avenue",          PropertyNumbers(3,  60,  4),  g["brown"]),
+            Property("Oriental Avenue",        PropertyNumbers(6,  100, 6),  g["light_blue"]),
+            Property("Vermont Avenue",         PropertyNumbers(8,  100, 6),  g["light_blue"]),
+            Property("Connecticut Avenue",     PropertyNumbers(9,  120, 8),  g["light_blue"]),
+            Property("St. Charles Place",      PropertyNumbers(11, 140, 10), g["pink"]),
+            Property("States Avenue",          PropertyNumbers(13, 140, 10), g["pink"]),
+            Property("Virginia Avenue",        PropertyNumbers(14, 160, 12), g["pink"]),
+            Property("St. James Place",        PropertyNumbers(16, 180, 14), g["orange"]),
+            Property("Tennessee Avenue",       PropertyNumbers(18, 180, 14), g["orange"]),
+            Property("New York Avenue",        PropertyNumbers(19, 200, 16), g["orange"]),
+            Property("Kentucky Avenue",        PropertyNumbers(21, 220, 18), g["red"]),
+            Property("Indiana Avenue",         PropertyNumbers(23, 220, 18), g["red"]),
+            Property("Illinois Avenue",        PropertyNumbers(24, 240, 20), g["red"]),
+            Property("Atlantic Avenue",        PropertyNumbers(26, 260, 22), g["yellow"]),
+            Property("Ventnor Avenue",         PropertyNumbers(27, 260, 22), g["yellow"]),
+            Property("Marvin Gardens",         PropertyNumbers(29, 280, 24), g["yellow"]),
+            Property("Pacific Avenue",         PropertyNumbers(31, 300, 26), g["green"]),
+            Property("North Carolina Avenue",  PropertyNumbers(32, 300, 26), g["green"]),
+            Property("Pennsylvania Avenue",    PropertyNumbers(34, 320, 28), g["green"]),
+            Property("Park Place",             PropertyNumbers(37, 350, 35), g["dark_blue"]),
+            Property("Boardwalk",              PropertyNumbers(39, 400, 50), g["dark_blue"]),
         ]
 
     def get_property_at(self, position):
         """Return the Property at `position`, or None if there is none."""
         for prop in self.properties:
-            if prop.position == position:
+            if prop.numbers.position == position:
                 return prop
         return None
 

@@ -1,14 +1,23 @@
+"""functions for property tiles"""
+
+import dataclasses
+
+@dataclasses.dataclass
+class PropertyNumbers:
+    """class to store some instance attributes"""
+    position: int
+    price: int
+    base_rent: int
+
 class Property:
     """Represents a single purchasable property tile on the MoneyPoly board."""
 
     FULL_GROUP_MULTIPLIER = 2
 
-    def __init__(self, name, position, price, base_rent, group=None):
+    def __init__(self, name, numbers : PropertyNumbers, group=None):
         self.name = name
-        self.position = position
-        self.price = price
-        self.base_rent = base_rent
-        self.mortgage_value = price // 2
+        self.numbers = numbers
+        self.mortgage_value = self.numbers.price // 2
         self.owner = None
         self.is_mortgaged = False
         self.houses = 0
@@ -27,8 +36,8 @@ class Property:
         if self.is_mortgaged:
             return 0
         if self.group is not None and self.group.all_owned_by(self.owner):
-            return self.base_rent * self.FULL_GROUP_MULTIPLIER
-        return self.base_rent
+            return self.numbers.base_rent * self.FULL_GROUP_MULTIPLIER
+        return self.numbers.base_rent
 
     def mortgage(self):
         """
@@ -47,10 +56,10 @@ class Property:
         """
         if not self.is_mortgaged:
             return 0
-        else:
-            cost = int(self.mortgage_value * 1.1)
-            self.is_mortgaged = False
-            return cost
+
+        cost = int(self.mortgage_value * 1.1)
+        self.is_mortgaged = False
+        return cost
 
     def is_available(self):
         """Return True if this property can be purchased (unowned, not mortgaged)."""
@@ -58,10 +67,11 @@ class Property:
 
     def __repr__(self):
         owner_name = self.owner.name if self.owner else "unowned"
-        return f"Property({self.name!r}, pos={self.position}, owner={owner_name!r})"
+        return f"Property({self.name!r}, pos={self.numbers.position}, owner={owner_name!r})"
 
 
 class PropertyGroup:
+    """deals with property groups (same color)"""
     def __init__(self, name, color):
         self.name = name
         self.color = color
@@ -77,6 +87,7 @@ class PropertyGroup:
         """Return True if every property in this group is owned by `player`."""
         if player is None:
             return False
+        # TODO: all not any
         return any(p.owner == player for p in self.properties)
 
     def get_owner_counts(self):

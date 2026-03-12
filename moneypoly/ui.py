@@ -50,8 +50,8 @@ def print_board_ownership(board):
         owner = prop.owner.name if prop.owner else "---"
         mortgage_flag = "*" if prop.is_mortgaged else " "
         print(
-            f"  {prop.position:>3}  {prop.name:<32}  "
-            f"${prop.price:>4}  ${prop.get_rent():>3}  "
+            f"  {prop.numbers.position:>3}  {prop.name:<32}  "
+            f"${prop.numbers.price:>4}  ${prop.get_rent():>3}  "
             f"{mortgage_flag}{owner}"
         )
     print("  (* = mortgaged)")

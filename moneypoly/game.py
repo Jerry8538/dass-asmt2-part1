@@ -128,7 +128,7 @@ class Game:
     def _handle_property_tile(self, player, prop):
         """Decide what to do when `player` lands on a property tile."""
         if prop.owner is None:
-            print(f"  {prop.name} is unowned — asking price ${prop.price}.")
+            print(f"  {prop.name} is unowned — asking price ${prop.numbers.price}.")
             choice = input("  Buy (b), Auction (a), or Skip (s)? ").strip().lower()
             if choice == "b":
                 self.buy_property(player, prop)
@@ -146,14 +146,14 @@ class Game:
         Purchase `prop` on behalf of `player`.
         Returns True on success, False if the player cannot afford it.
         """
-        if player.balance <= prop.price:
-            print(f"  {player.name} cannot afford {prop.name} (${prop.price}).")
+        if player.balance <= prop.numbers.price:
+            print(f"  {player.name} cannot afford {prop.name} (${prop.numbers.price}).")
             return False
-        player.deduct_money(prop.price)
+        player.deduct_money(prop.numbers.price)
         prop.owner = player
         player.add_property(prop)
-        self.bank.collect(prop.price)
-        print(f"  {player.name} purchased {prop.name} for ${prop.price}.")
+        self.bank.collect(prop.numbers.price)
+        print(f"  {player.name} purchased {prop.name} for ${prop.numbers.price}.")
         return True
 
     def pay_rent(self, player, prop):
@@ -226,7 +226,7 @@ class Game:
 
     def auction_property(self, prop):
         """Run an open auction for `prop` among all active players."""
-        print(f"\n  [Auction] Bidding on {prop.name} (listed at ${prop.price})")
+        print(f"\n  [Auction] Bidding on {prop.name} (listed at ${prop.numbers.price})")
         highest_bid = 0
         highest_bidder = None
 
