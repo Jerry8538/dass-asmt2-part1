@@ -43,9 +43,9 @@ class Bank:
         Issue an emergency loan to `player`, crediting their balance with `amount`.
         The bank's own funds are reduced accordingly.
         """
-        # TODO: bank's funds aren't reduced
         if amount <= 0:
             return
+        self._funds -= amount
         player.add_money(amount)
         self._loans_issued.append((player.name, amount))
         print(f"  Bank issued a ${amount} emergency loan to {player.name}.")
