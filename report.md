@@ -92,61 +92,55 @@ During the white-box testing phase of the active code, 13 functional bugs were u
 - **Expected Result**: Monopoly requires owning all properties (`False`). Rent multiplier is standard ($1\times$).
 - **Actual Result**: Code explicitly utilizes `any()` instead of `all()`. Purchasing one singular property triggers universally doubled rents across every piece of the property chain.
 
-### Bug 4: Get Out Of Jail Free Cards Crash System
-- **Module/Method Tested**: `Game._apply_card()`
-- **Input/State**: Player triggers `jail_free` card.
-- **Expected Result**: Card increments the `jail_state.get_out_of_jail_cards` dataclass tracker.
-- **Actual Result**: Code triggers `player.get_out_of_jail_cards += 1`. This circumvents `jail_state`, causing a fatal `AttributeError` and crashing the runtime.
-
-### Bug 5: Voluntary Jail Payment never Deducts from Player
+### Bug 4: Voluntary Jail Payment never Deducts from Player
 - **Module/Method Tested**: `Game._handle_jail_turn()`
 - **Input/State**: Player enters `y` on the input prompt to exit jail. 
 - **Expected Result**: `self.bank.collect(50)` alongside `player.deduct_money(50)`.
 - **Actual Result**: Only `self.bank.collect(50)` executes. The player's balance retains its initial amounts, enabling infinitely exploitable jail evasions with absolutely zero fund deduction.
 
-### Bug 6: Dice Uses `randint(1, 5)` Instead of `randint(1, 6)`
+### Bug 5: Dice Uses `randint(1, 5)` Instead of `randint(1, 6)`
 - **Module/Method Tested**: `Dice.roll()`
 - **Input/State**: Rolling dice 1000 times and collecting all unique outcomes.
 - **Expected Result**: Docstring describes "six-sided dice". Values `1` through `6` should all appear.
 - **Actual Result**: `random.randint(1, 5)` is used. The value `6` never appears on either die, and the maximum possible roll is `10` instead of `12`.
 
-### Bug 7: `find_winner()` Returns the Loser
+### Bug 6: `find_winner()` Returns the Loser
 - **Module/Method Tested**: `Game.find_winner()`
 - **Input/State**: Two players: Alice with `$5000`, Bob with `$100`.
 - **Expected Result**: Docstring says "Return the player with the highest net worth". Alice should win.
 - **Actual Result**: Code uses `min()` instead of `max()`. Bob (the poorest player) is declared the winner.
 
-### Bug 8: `buy_property()` Rejects Purchase at Exact Balance
+### Bug 7: `buy_property()` Rejects Purchase at Exact Balance
 - **Module/Method Tested**: `Game.buy_property()`
 - **Input/State**: Player has exactly `$60` and attempts to buy Mediterranean Avenue (price `$60`).
 - **Expected Result**: Purchase succeeds since the player can exactly afford it.
 - **Actual Result**: The guard `player.balance <= prop.numbers.price` uses `<=` instead of `<`, rejecting the purchase when the player has exactly enough money.
 
-### Bug 9: `pay_rent()` Does not Transfer Rent to Property Owner
+### Bug 8: `pay_rent()` Does not Transfer Rent to Property Owner
 - **Module/Method Tested**: `Game.pay_rent()`
 - **Input/State**: Player 1 lands on Player 2's property. Rent is deducted from Player 1.
 - **Expected Result**: Player 2's balance increases by the rent amount.
 - **Actual Result**: `player.deduct_money(rent)` is called, but `prop.owner.add_money(rent)` is never invoked. The rent money vanishes entirely.
 
-### Bug 10: `net_worth()` Ignores Property Values
+### Bug 9: `net_worth()` Ignores Property Values
 - **Module/Method Tested**: `Player.net_worth()`
 - **Input/State**: Player with `$100` cash and a property worth `$500`.
 - **Expected Result**: Net worth should incorporate property holdings (e.g., `$600`).
 - **Actual Result**: `net_worth()` simply returns `self.balance`. A player with enormous real estate holdings but low cash is valued as nearly bankrupt.
 
-### Bug 11: `_handle_move_card()` Ignores Non-Property Special Tiles
+### Bug 10: `_handle_move_card()` Ignores Non-Property Special Tiles
 - **Module/Method Tested**: `Game._handle_move_card()`
 - **Input/State**: A card moves the player to position `30` (Go To Jail).
 - **Expected Result**: The player should be sent to jail.
 - **Actual Result**: The method only checks `if tile == "property"`. All non-property special tiles (income tax, go to jail, etc.) are silently ignored at the destination.
 
-### Bug 12: Railroad Tiles Have No Property Objects
+### Bug 11: Railroad Tiles Have No Property Objects
 - **Module/Method Tested**: `Board.get_property_at()` for positions `5, 15, 25, 35`
 - **Input/State**: Player lands on a railroad tile during gameplay.
 - **Expected Result**: Railroad positions should map to purchasable `Property` objects.
 - **Actual Result**: No `Property` objects are created for railroad positions. `get_property_at()` returns `None`, and the `if prop is not None` guard silently skips. Railroads are effectively blank tiles.
 
-### Bug 13: `doubles_streak` Never Reset After Player is Sent to Jail
+### Bug 12: `doubles_streak` Never Reset After Player is Sent to Jail
 - **Module/Method Tested**: `Game.play_turn()` / `Dice.is_doubles()` usage
 - **Input/State**: Player A rolls 3 consecutive doubles and is sent to jail. The turn advances to Player B.
 - **Expected Result**: The `doubles_streak` counter should automatically reset to `0` for Player B.
@@ -158,13 +152,13 @@ During the white-box testing phase of the active code, 13 functional bugs were u
 
 These bugs exist strictly within the interactive menu flow, which currently constitutes dead code unable to be executed naturally by the core game loop.
 
-### Bug 1: Emergency Loans do not Drain Bank Funds
+### Bug 6: Emergency Loans do not Drain Bank Funds
 - **Module/Method Tested**: `Bank.give_loan()`
 - **Input/State**: The pre-roll menu issues a $500 emergency loan to the Player.
 - **Expected Result**: Player `balance` correctly increases by 500, and the Bank `_funds` logically decrease by 500.
 - **Actual Result**: The player correctly receives the 500, but the bank's internal balance is never decreased, creating synthetic money.
 
-### Bug 2: Trades Delete Player Cash Assets without Delivery
+### Bug 7: Trades Delete Player Cash Assets without Delivery
 - **Module/Method Tested**: `Game.trade()`
 - **Input/State**: Player 1 sells property to Player 2 strictly for $100 via the pre-roll menu.
 - **Expected Result**: Player 2 loses property and gains $100. Player 1 loses $100.
