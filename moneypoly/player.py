@@ -39,7 +39,7 @@ class Player:
 
     def net_worth(self):
         """Calculate and return this player's total net worth."""
-        return self.balance
+        return self.balance + sum(p.numbers.price for p in self.properties)
 
     def move(self, steps):
         """
