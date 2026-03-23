@@ -49,6 +49,7 @@ class Board:
             "yellow":     PropertyGroup("Yellow",     "yellow"),
             "green":      PropertyGroup("Green",      "green"),
             "dark_blue":  PropertyGroup("Dark Blue",  "dark_blue"),
+            "railroad":   PropertyGroup("Railroad",   "railroad"),
         }
 
     def _create_properties(self):
@@ -77,6 +78,10 @@ class Board:
             Property("Pennsylvania Avenue",    PropertyNumbers(34, 320, 28), g["green"]),
             Property("Park Place",             PropertyNumbers(37, 350, 35), g["dark_blue"]),
             Property("Boardwalk",              PropertyNumbers(39, 400, 50), g["dark_blue"]),
+            Property("Reading Railroad",       PropertyNumbers(5,  200, 25), g["railroad"]),
+            Property("Pennsylvania Railroad",  PropertyNumbers(15, 200, 25), g["railroad"]),
+            Property("B. & O. Railroad",       PropertyNumbers(25, 200, 25), g["railroad"]),
+            Property("Short Line",             PropertyNumbers(35, 200, 25), g["railroad"]),
         ]
 
     def get_property_at(self, position):
