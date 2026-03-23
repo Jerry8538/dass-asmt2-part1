@@ -305,16 +305,8 @@ class Game:
 
     def _handle_move_card(self, player, value):
         """deals with a move_to card drawn by player"""
-        old_pos = player.position
-        player.position = value
-        if value < old_pos:
-            player.add_money(GO_SALARY)
-            print(f"  {player.name} passed Go and collected ${GO_SALARY}.")
-        tile = self.board.get_tile_type(value)
-        if tile == "property":
-            prop = self.board.get_property_at(value)
-            if prop:
-                self._handle_property_tile(player, prop)
+        steps = (value - player.position) % 40
+        self._move_and_resolve(player, steps)
 
     def _apply_card(self, player, card):
         """Apply the effect of a drawn Chance or Community Chest card."""
