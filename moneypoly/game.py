@@ -45,6 +45,7 @@ class Game:
 
     def advance_turn(self):
         """Move to the next player in the rotation."""
+        self.dice.doubles_streak = 0
         self.state.current_index = (self.state.current_index + 1) % len(self.players)
         self.state.turn_number += 1
 
