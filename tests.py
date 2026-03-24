@@ -146,7 +146,7 @@ def test_property_group_rent_and_bug():
 
 def test_board_initialization():
     board = Board()
-    assert len(board.properties) == 22
+    assert len(board.properties) == 26
     assert board.get_property_at(1).name == "Mediterranean Avenue"
     assert board.get_property_at(99) is None
 
@@ -514,7 +514,7 @@ def test_board_methods():
     assert board.is_special_tile(0) is True
     assert board.is_purchasable(1) is True
     assert len(board.properties_owned_by(Player("P"))) == 0
-    assert len(board.unowned_properties()) == 22
+    assert len(board.unowned_properties()) == 26
 
 def test_cards_deck_dead_methods():
     raw_cards = [{"action": "collect", "value": 10}, {"action": "pay", "value": 20}]
